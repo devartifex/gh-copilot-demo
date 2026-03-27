@@ -574,9 +574,34 @@ Ask Copilot to work with Excel files in natural language:
 
 > **How it works:** Copilot generates and executes Python scripts (openpyxl/pandas) behind the scenes. You describe what you want in natural language — no coding required.
 
-### PowerPoint Generation (Brief Mention)
+### PowerPoint Generation — Real Example with a Copilot Skill
 
-Copilot can generate presentations from structured data using agent mode + python-pptx. Best for automated reports, not strategic decks.
+A concrete example of Copilot generating PowerPoint presentations is the **[copilot-updates](https://github.com/devartifex/copilot-updates)** skill. It's an open-source Copilot skill that:
+
+- Fetches articles from the [GitHub Changelog](https://github.blog/changelog/) by date range and label
+- Generates structured summaries with speaker notes
+- Produces a complete `.pptx` deck with python-pptx — ready for stakeholder updates
+
+Install it as a **personal skill** (available across all your projects):
+
+```bash
+# Clone into your user skills directory
+git clone https://github.com/devartifex/copilot-updates ~/.copilot/skills/copilot-updates
+
+# Install Python dependencies
+cd ~/.copilot/skills/copilot-updates/scripts && pip install -e .
+```
+
+Then just ask Copilot:
+
+```
+"Generate a PowerPoint with all GitHub Copilot updates from the last 2 weeks in Italian"
+"Summarize the GitHub changelog for Actions and Security from March 1 to March 15"
+```
+
+Copilot auto-loads the skill and runs the full pipeline: fetch → summarize → translate → generate `.pptx`.
+
+> This is a great example of **skills as cross-project reusable tools** — installed once in `~/.copilot/skills/`, available everywhere, no repo changes needed.
 
 ### Code Review on Pull Requests 🔍
 
