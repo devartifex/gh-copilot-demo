@@ -1,0 +1,18 @@
+{
+  "name": "gh-copilot-demo",
+  "version": "1.0.0",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "fuser -k 3000/tcp 4321/tcp 2>/dev/null; concurrently --kill-others-on-fail \"node backend/index.js\" \"node_modules/.bin/astro dev --root ./frontend\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

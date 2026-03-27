@@ -1,0 +1,157 @@
+---
+interface Props {
+    id: number;
+    text: string;
+    completed: boolean;
+}
+
+const { id, text, completed } = Astro.props;
+---
+
+<div class="todo-item d-flex align-items-center justify-content-between border-bottom py-2">
+    <div class="form-check d-flex align-items-center flex-grow-1 me-2">
+        <input 
+            class="form-check-input"
+            type="checkbox"
+            id={`todo-${id}`}
+            checked={completed}
+            data-id={id}
+        />
+        <label 
+            class={`form-check-label ms-2 ${completed ? 'text-decoration-line-through' : ''}`}
+            for={`todo-${id}`}
+        >
+            <span class="todo-text">{text}</span>
+            <input type="text" class="form-control edit-input d-none" value={text} />
+        </label>
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-outline-primary btn-sm edit-todo" data-id={id}>
+            <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-outline-danger btn-sm delete-todo" data-id={id}>
+            <i class="bi bi-trash"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    function updateTodoStatus(id: number, completed: boolean) {
+        fetch(`http://localhost:3000/todos/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ completed }),
+        }).then(() => {
+            window.location.reload();
+        });
+    }
+
+    function updateTodoText(id: number, text: string) {
+        fetch(`http://localhost:3000/todos/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text }),
+        }).then(() => {
+            window.location.reload();
+        });
+    }
+
+    function deleteTodo(id: number) {
+        fetch(`http://localhost:3000/todos/${id}`, {
+            method: 'DELETE',
+        }).then(() => {
+            window.location.reload();
+        });
+    }
+
+    // Event listeners
+    document.querySelectorAll('.form-check-input').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            const target = e.target as HTMLInputElement;
+            const id = target.dataset.id;
+            if (id) {
+                updateTodoStatus(parseInt(id), target.checked);
+            }
+        });
+    });
+
+    document.querySelectorAll('.edit-todo').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const target = e.currentTarget as HTMLButtonElement;
+            const todoItem = target.closest('.todo-item');
+            if (todoItem) {
+                const textSpan = todoItem.querySelector('.todo-text') as HTMLSpanElement;
+                const inputField = todoItem.querySelector('.edit-input') as HTMLInputElement;
+                
+                if (textSpan.classList.contains('d-none')) {
+                    // Salva le modifiche
+                    const id = target.dataset.id;
+                    if (id && inputField.value.trim()) {
+                        updateTodoText(parseInt(id), inputField.value.trim());
+                    }
+                } else {
+                    // Entra in modalità modifica
+                    textSpan.classList.add('d-none');
+                    inputField.classList.remove('d-none');
+                    inputField.focus();
+                    target.innerHTML = '<i class="bi bi-check"></i>';
+                }
+            }
+        });
+    });
+
+    document.querySelectorAll('.edit-input').forEach(input => {
+        input.addEventListener('keyup', (e) => {
+            const event = e as KeyboardEvent;
+            const target = event.target as HTMLInputElement;
+            if (event.key === 'Enter' && target.value.trim()) {
+                const todoItem = target.closest('.todo-item');
+                const editButton = todoItem?.querySelector('.edit-todo') as HTMLButtonElement;
+                const id = editButton?.dataset.id;
+                if (id) {
+                    updateTodoText(parseInt(id), target.value.trim());
+                }
+            } else if (event.key === 'Escape') {
+                const todoItem = target.closest('.todo-item');
+                if (todoItem) {
+                    const textSpan = todoItem.querySelector('.todo-text') as HTMLSpanElement;
+                    target.classList.add('d-none');
+                    textSpan.classList.remove('d-none');
+                    const editButton = todoItem.querySelector('.edit-todo') as HTMLButtonElement;
+                    editButton.innerHTML = '<i class="bi bi-pencil"></i>';
+                }
+            }
+        });
+    });
+
+    document.querySelectorAll('.delete-todo').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const target = e.currentTarget as HTMLButtonElement;
+            const id = target.dataset.id;
+            if (id) {
+                deleteTodo(parseInt(id));
+            }
+        });
+    });
+</script>
+
+<style>
+    .edit-input {
+        margin: -4px 0;
+        padding: 2px 8px;
+        font-size: inherit;
+    }
+    
+    .todo-item:hover .btn-group {
+        opacity: 1;
+    }
+    
+    .btn-group {
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+</style>

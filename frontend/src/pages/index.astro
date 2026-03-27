@@ -1,0 +1,88 @@
+---
+interface Todo {
+    id: number;
+    text: string;
+    completed: boolean;
+}
+
+import Layout from '../layouts/Layout.astro';
+import TodoItem from '../components/TodoItem.astro';
+
+// Fetch todos from API
+const response = await fetch('http://localhost:3000/todos');
+const todos: Todo[] = await response.json();
+---
+
+<Layout title="Todo List">
+	<div class="row justify-content-center">
+		<div class="col-md-8">
+			<div class="card">
+				<div class="card-header bg-primary text-white">
+					<h2 class="h5 mb-0">Add New Todo</h2>
+				</div>
+				<div class="card-body">
+					<form id="todo-form" class="mb-4">
+						<div class="input-group">
+							<input
+								type="text"
+								id="todo-text"
+								class="form-control"
+								placeholder="What needs to be done?"
+								required
+							/>
+							<button type="submit" class="btn btn-primary">
+								Add Todo
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<div class="card mt-4">
+				<div class="card-header bg-primary text-white">
+					<h2 class="h5 mb-0">My Todos</h2>
+				</div>
+				<div class="card-body">
+					{todos.length === 0 ? (
+						<p class="text-center text-muted">No todos yet. Add one above!</p>
+					) : (
+						<div class="todo-list">
+							{todos.map((todo: Todo) => (
+								<TodoItem id={todo.id} text={todo.text} completed={todo.completed} />
+							))}
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	</div>
+</Layout>
+
+<script>
+	const form = document.getElementById('todo-form') as HTMLFormElement;
+	const input = document.getElementById('todo-text') as HTMLInputElement;
+
+	form.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		const text = input.value.trim();
+		
+		if (text) {
+			await fetch('http://localhost:3000/todos', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ text }),
+			});
+			
+			window.location.reload();
+		}
+	});
+</script>
+
+<style>
+	.todo-list {
+		max-height: 400px;
+		overflow-y: auto;
+	}
+</style>
