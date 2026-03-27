@@ -164,6 +164,18 @@ Reusable prompt templates you attach in Copilot Chat.
 | `add-dark-mode.prompt.md` | Add dark/light mode toggle |
 | `refactor-routes.prompt.md` | Separate routes into modules |
 
+### 🎯 Hands-on Workshop Guide
+
+For a complete, step-by-step workshop guide with theory, commands, and demos for both VS Code and CLI, see the **[DEMO-GUIDE.md](DEMO-GUIDE.md)**.
+
+The guide covers:
+- All customization features (instructions, prompts, agents, skills, hooks, MCP, plugins)
+- Operating modes comparison (Ask, Plan, Agent, Autopilot, Fleet)
+- Model selection guidance with official recommendations
+- Premium request mechanics for every context (chat, CLI, coding agent, PR review, fleet)
+- Code review configuration on pull requests
+- Non-coding use cases (Excel, PowerPoint)
+
 ---
 
 ## 📖 Workshop Demo Agenda
