@@ -6,7 +6,7 @@
     "frontend"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail \"node backend/index.js\" \"node_modules/.bin/astro dev --root ./frontend\""
+    "dev": "fuser -k 3000/tcp 4321/tcp 2>/dev/null; concurrently --kill-others-on-fail \"node backend/index.js\" \"node_modules/.bin/astro dev --root ./frontend\""
   },
   "keywords": [],
   "author": "",
