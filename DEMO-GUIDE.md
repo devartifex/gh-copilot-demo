@@ -246,19 +246,39 @@ Beyond the four main levers, Copilot CLI supports additional customization primi
 ### 2.6 Where Each Customization Can Live: Repo vs User vs Org
 
 📎 [Customization cheat sheet](https://docs.github.com/en/copilot/reference/customization-cheat-sheet)
+📎 [Feature matrix](https://docs.github.com/en/copilot/reference/copilot-feature-matrix)
+📎 [Custom instructions support](https://docs.github.com/en/copilot/reference/custom-instructions-support)
 
-| Feature | Repo (`.github/`) | User (`~/.copilot/`) | Org/Enterprise | Notes |
+> **Important:** Not all customization features are available in all environments. The table below shows what's supported where — differences between VS Code, CLI, and GitHub.com are significant.
+
+#### Feature Availability: VS Code vs CLI vs GitHub.com
+
+| Feature | VS Code | CLI | GitHub.com | Notes |
 |---|---|---|---|---|
-| **Custom Instructions** | ✅ `copilot-instructions.md`, `instructions/*.instructions.md`, `AGENTS.md` | ✅ `$HOME/.copilot/copilot-instructions.md` + `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` env | ✅ via GitHub UI settings | Most flexible |
-| **Prompt Files** | ✅ `prompts/*.prompt.md` | ✅ VS Code profile `prompts/` folder | ❌ | User-level supported in VS Code |
-| **Custom Agents** | ✅ `agents/*.agent.md` | ✅ User profile | ✅ `.github-private` repo | Lowest level wins |
-| **Skills** | ✅ `skills/<name>/SKILL.md` | ✅ `~/.copilot/skills/` (CLI + agent) | 🔜 Coming soon | Personal = cross-project |
-| **Hooks** | ✅ `hooks/*.json` | ❌ | ❌ | Repo-only |
-| **MCP Servers** | ✅ `mcp.json` + repo settings | ✅ User IDE config | ✅ Agent config | Varies by IDE |
-| **Subagents** | N/A (runtime) | N/A | N/A | Not user-configured |
-| **Plugins** | N/A | ✅ CLI plugin system | N/A | User-installed |
+| **Custom Instructions** | ✅ | ✅ | ✅ | All environments support repo-wide; CLI adds user-level file |
+| **Prompt Files** | ✅ | ✅ | ❌ | Not available on GitHub.com |
+| **Custom Agents** | ✅ | ✅ | ✅ | All environments |
+| **Skills** | ✅ (since 1.108) | ✅ | ✅ (coding agent) | Not in Visual Studio |
+| **Hooks** | Preview | ✅ | ✅ (coding agent) | Primarily CLI + GitHub.com coding agent |
+| **MCP Servers** | ✅ | ✅ | ✅ | All environments |
+| **Subagents** | ✅ | ✅ | ❌ | Runtime process, not user-configured |
+| **Plugins** | ❌ | ✅ | ❌ | CLI-only feature |
+| **Fleet Mode** | ❌ | ✅ | ❌ | CLI-only feature |
 
-> **Key takeaway:** If your organization doesn't allow committing AI config files in repos, the workaround is user-level config (`~/.copilot/`). Custom Instructions, Skills, and Custom Agents all support this. Prompt Files are also available at user level in VS Code (profile `prompts/` folder). Hooks are repo-only — no workaround.
+#### Where Each Customization Can Live: Repo vs User vs Org
+
+| Feature | Repo (`.github/`) | User level | Org/Enterprise | Key differences |
+|---|---|---|---|---|
+| **Custom Instructions** | ✅ `copilot-instructions.md`, `instructions/*.instructions.md`, `AGENTS.md` | ✅ **CLI**: `$HOME/.copilot/copilot-instructions.md` + `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` env. **VS Code**: via settings UI. **GitHub.com**: personal instructions in settings | ✅ Organization instructions via GitHub UI | CLI user-level is file-based; VS Code/GitHub.com is settings-based |
+| **Prompt Files** | ✅ `prompts/*.prompt.md` | ✅ **VS Code only**: `prompts/` folder in user profile. **CLI**: ❌ no user-level | ❌ | User-level prompt files are a VS Code feature only |
+| **Custom Agents** | ✅ `agents/*.agent.md` | ✅ User profile (VS Code + CLI) | ✅ `.github-private` repo | Lowest level wins on name conflicts |
+| **Skills** | ✅ `skills/<name>/SKILL.md` | ✅ **CLI + coding agent**: `~/.copilot/skills/`. **VS Code**: ✅ (since 1.108) | 🔜 Coming soon | Personal skills shared across projects |
+| **Hooks** | ✅ `hooks/*.json` | ❌ | ❌ | Repo-level only |
+| **MCP Servers** | ✅ `mcp.json` + repo settings | ✅ User IDE config (VS Code `settings.json`, CLI config) | ✅ via `mcp-servers` property in agent configs | Config format varies by environment |
+| **Subagents** | N/A (runtime) | N/A | N/A | Not user-configured |
+| **Plugins** | N/A | ✅ CLI plugin system (user-installed globally) | N/A | CLI-only |
+
+> **Key takeaway:** If your organization doesn't allow committing AI config files in repos, the workaround is user-level config. Custom Instructions, Skills, and Custom Agents all support user-level in both VS Code and CLI. Prompt Files are user-level in VS Code only (profile `prompts/` folder). Hooks and Plugins are environment-specific — hooks are repo-only, plugins are CLI-only.
 
 ---
 
