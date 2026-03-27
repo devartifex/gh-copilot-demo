@@ -111,7 +111,7 @@ This starts:
 
 ## 🤖 GitHub Copilot Customization
 
-This repository is a showcase for all the ways you can customize GitHub Copilot's behavior. See the [Copilot Configuration Guide](.github/copilot-config-guide.md) for a full explanation of each feature.
+This repository is a showcase for all the ways you can customize GitHub Copilot's behavior. See the **[Hands-on Workshop Guide](DEMO-GUIDE.md)** for a comprehensive explanation of each feature with demos and commands.
 
 ### Custom Instructions
 

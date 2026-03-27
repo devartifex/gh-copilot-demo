@@ -612,14 +612,14 @@ Copilot auto-loads the skill and runs the full pipeline: fetch → summarize →
 | **How to activate** | From PR → click "Copilot" → "Review", or configure auto-review at org/repo level |
 | **Model used** | Auto-selected by GitHub (not configurable by user) |
 | **Premium cost** | 1 × model multiplier. **Automatic reviews:** charged to the PR author's quota. **Manual reviews:** charged to the requesting user's quota |
-| **Configure strictness** | Create `.github/copilot-code-review-instructions.md` in your repo |
+| **Configure strictness** | Use `.github/copilot-instructions.md` (repo-wide) or `.github/instructions/code-review.instructions.md` (path-specific) |
 
 **🔧 Hands-on Demo:**
 
 1. Create a PR with the dark mode changes from earlier
 2. Click "Copilot" → "Review" on the PR
 3. Observe the review comments
-4. Show the `copilot-code-review-instructions.md` file that controls what Copilot flags
+4. Show the `instructions/code-review.instructions.md` file that controls what Copilot flags during review
 5. Discuss: without this file, Copilot may flag trivial issues (like `todo` vs `TODO:`)
 
 ---
