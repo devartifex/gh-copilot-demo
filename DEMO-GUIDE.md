@@ -91,7 +91,7 @@ Copilot isn't just autocomplete — it's a deeply customizable assistant. This s
    - Observe: Copilot follows Astro + Bootstrap patterns from `astro-frontend.instructions.md`
 3. CLI equivalent:
    ```bash
-   copilot "Add a new PATCH /todos/:id endpoint to update the todo text"
+   copilot -p "Add a new PATCH /todos/:id endpoint to update the todo text"
    ```
    - Same instructions are loaded automatically
 4. Disable instructions to see the difference:
@@ -114,9 +114,12 @@ Copilot isn't just autocomplete — it's a deeply customizable assistant. This s
 
 ### 2.2 Prompt Files
 
-**What they are:** Reusable Markdown templates you attach in Copilot Chat. Write the instructions once, reuse with different inputs. Support YAML frontmatter for model, tools, and agent selection, plus `{{variable}}` placeholders.
+**What they are:** Reusable Markdown templates you attach in Copilot Chat. Write the instructions once, reuse with different inputs. Support YAML frontmatter for model, tools, and agent selection, plus `${input:variable}` placeholders.
 
-**Where they live:** `.github/prompts/*.prompt.md` — **repo level ONLY** (not available at user level)
+**Where they live:**
+
+- **Repo**: `.github/prompts/*.prompt.md`
+- **User-level (VS Code)**: `prompts/` folder in VS Code user profile
 
 **When to use:** Focused, single-purpose tasks you run repeatedly with different inputs.
 **When NOT to use:** If the guidance should apply to everything → use Custom Instructions.
@@ -169,7 +172,7 @@ Naming conflicts: lowest level wins (repo > org > enterprise).
 4. Try `todo-testing` agent → ask: *"Generate tests for the DELETE /todos/:id endpoint"*
 5. CLI built-in agents:
    ```bash
-   copilot "Review the staged changes for security issues"
+   copilot -p "Review the staged changes for security issues"
    # Copilot may auto-delegate to the code-review agent
    ```
 
@@ -209,7 +212,8 @@ Naming conflicts: lowest level wins (repo > org > enterprise).
 3. CLI:
    ```bash
    /skills list    # List available skills
-   /create-rest-endpoint "Add a GET /todos/stats endpoint"   # Manual invocation
+   # Skills auto-load based on your prompt. Just describe the task:
+   copilot -p "Add a GET /todos/stats endpoint"   # create-rest-endpoint skill loads automatically
    ```
 
 **📁 Skills in this repo:**
@@ -233,7 +237,7 @@ Beyond the four main levers, Copilot CLI supports additional customization primi
 |---|---|---|---|
 | **Tools** | Operational abilities (read, edit, search, execute) | Built-in; user can allow/deny per tool | N/A — always present |
 | **MCP Servers** | Connect to external systems, APIs, databases | Need external data or domain-specific actions | Built-in tools cover your needs |
-| **Hooks** | Custom shell commands at lifecycle moments (`preToolUse`, `postToolUse`, `sessionStart`, `sessionEnd`, `errorOccurred`, `agentStop`, `subagentStop`) | Guardrails, logging, policy enforcement | Just need consistent prompting → use Skills |
+| **Hooks** | Custom shell commands at lifecycle moments (`preToolUse`, `postToolUse`, `userPromptSubmitted`, `sessionStart`, `sessionEnd`, `errorOccurred`, `agentStop`, `subagentStop`) | Guardrails, logging, policy enforcement | Just need consistent prompting → use Skills |
 | **Subagents** | Delegated agent processes with separate context window | Copilot decides automatically | N/A — runtime behavior |
 | **Plugins** | Installable bundles (skills + agents + hooks + MCP) | Team-wide bundles, easy distribution | Experimenting locally → use local files |
 
@@ -246,7 +250,7 @@ Beyond the four main levers, Copilot CLI supports additional customization primi
 | Feature | Repo (`.github/`) | User (`~/.copilot/`) | Org/Enterprise | Notes |
 |---|---|---|---|---|
 | **Custom Instructions** | ✅ `copilot-instructions.md`, `instructions/*.instructions.md`, `AGENTS.md` | ✅ `$HOME/.copilot/copilot-instructions.md` + `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` env | ✅ via GitHub UI settings | Most flexible |
-| **Prompt Files** | ✅ `prompts/*.prompt.md` | ❌ Not supported | ❌ | Repo-only |
+| **Prompt Files** | ✅ `prompts/*.prompt.md` | ✅ VS Code profile `prompts/` folder | ❌ | User-level supported in VS Code |
 | **Custom Agents** | ✅ `agents/*.agent.md` | ✅ User profile | ✅ `.github-private` repo | Lowest level wins |
 | **Skills** | ✅ `skills/<name>/SKILL.md` | ✅ `~/.copilot/skills/` (CLI + agent) | 🔜 Coming soon | Personal = cross-project |
 | **Hooks** | ✅ `hooks/*.json` | ❌ | ❌ | Repo-only |
@@ -254,7 +258,7 @@ Beyond the four main levers, Copilot CLI supports additional customization primi
 | **Subagents** | N/A (runtime) | N/A | N/A | Not user-configured |
 | **Plugins** | N/A | ✅ CLI plugin system | N/A | User-installed |
 
-> **Key takeaway:** If your organization doesn't allow committing AI config files in repos, the workaround is user-level config (`~/.copilot/`). Custom Instructions, Skills, and Custom Agents all support this. Prompt Files and Hooks are repo-only — no workaround.
+> **Key takeaway:** If your organization doesn't allow committing AI config files in repos, the workaround is user-level config (`~/.copilot/`). Custom Instructions, Skills, and Custom Agents all support this. Prompt Files are also available at user level in VS Code (profile `prompts/` folder). Hooks are repo-only — no workaround.
 
 ---
 
@@ -264,8 +268,8 @@ Beyond the four main levers, Copilot CLI supports additional customization primi
 |---|---|---|---|
 | **Ask** | Chat panel (default) | Direct prompt | Quick questions, explanations |
 | **Plan** | Plan mode in chat | `/plan` | Analyze context → plan → confirm before acting |
-| **Agent** | Agent mode (dropdown) | Default mode | Complex, iterative tasks |
-| **Autopilot** | Agent → Autopilot (VS Code 1.111+) | `--dangerously-skip-permissions` | Fully autonomous, no approvals |
+| **Agent** | Agent mode (dropdown) | Standard mode (agentic by default) | Complex, iterative tasks |
+| **Autopilot** | Agent → Autopilot (VS Code 1.111+) | `--autopilot --allow-all` | Fully autonomous, no approvals |
 | **Fleet** | N/A | `/fleet` | Parallelizable tasks, multiple subagents |
 
 #### Autopilot in VS Code (NEW!)
@@ -335,10 +339,10 @@ Copilot customizations can be configured at multiple levels:
 
 ```bash
 # macOS
-brew install gh-copilot
+brew install copilot-cli
 
 # Windows
-winget install GitHub.CopilotCLI
+winget install GitHub.Copilot
 
 # Verify
 copilot --version
@@ -352,13 +356,13 @@ CLI sessions appear in VS Code's Copilot Chat "Sessions" view, and vice versa. T
 
 | Feature | Command | Description |
 |---|---|---|
-| Ask | `copilot "question"` | Direct question |
+| Ask | `copilot -p "question"` | Direct question |
 | Plan | `/plan "task"` | Plan before acting |
 | Fleet | `/fleet "task"` | Parallel execution |
 | Skills | `/skills list` | List available skills |
 | Plugins | `/plugin install NAME` | Install plugin bundle |
 | Allow tools | `--allow-tool TOOL` | Pre-approve specific tools |
-| Full autonomy | `--dangerously-skip-permissions` | Skip all permission prompts |
+| Full autonomy | `--allow-all` (or `--yolo`) | Skip all permission prompts |
 | No instructions | `--no-custom-instructions` | Disable custom instructions |
 
 ### Hooks (CLI lifecycle events)
@@ -378,7 +382,7 @@ Use hooks for guardrails (block edits to protected paths), logging, or custom re
 
 ```bash
 # Same task in CLI vs VS Code — compare the experience
-copilot "Explain the structure of the backend API"
+copilot -p "Explain the structure of the backend API"
 
 # Use plan mode
 /plan "Add a search endpoint to filter todos by text"
@@ -388,7 +392,8 @@ copilot "Explain the structure of the backend API"
 
 # List and invoke skills
 /skills list
-/create-rest-endpoint "Add GET /todos/search?q=query endpoint"
+# Skills auto-load based on context; just describe the task:
+copilot -p "Add GET /todos/search?q=query endpoint"
 ```
 
 ---
@@ -415,10 +420,10 @@ copilot "Explain the structure of the backend API"
 
 | Use Case | Recommended Model | Multiplier | Key Takeaway |
 |---|---|---|---|
-| In-depth PR review | Claude Opus 4.6 (premium) | 3x | Complex analysis deserves a premium model |
-| Planning/architecture + review | Opus for analysis → GPT-5.4 for fix | 3x + 1x | Multi-model pattern: review premium, fix standard |
+| In-depth PR review | Claude Opus 4.6 (premium) | 1x | Complex analysis deserves a premium model |
+| Planning/architecture + review | Opus for analysis → GPT-5.4 for fix | 1x + 1x | Multi-model pattern: review premium, fix standard |
 | Refactoring / implementation | GPT-5.4 | 1x | Unified GPT + Codex, native agent support |
-| Quick lightweight tasks | GPT-5.4 mini | 0.33x | Near-premium benchmarks at minimal cost |
+| Quick lightweight tasks | GPT-5.4 mini | 1x | Near-premium benchmarks at standard cost |
 | Documentation / comments | Free tier model | 0x | Keep repetitive writing lightweight |
 | Auto-fill PR description | Free model + prompt file | 0x | Automate with model auto-selection |
 | Commit message generation | Free model + prompt file | 0x | Consistent git history at zero cost |
@@ -431,7 +436,7 @@ copilot "Explain the structure of the backend API"
 
 The most cost-effective workflow for complex tasks:
 
-1. **Analyze** with a premium model (Opus 4.6 at 3x) — get deep understanding
+1. **Analyze** with a premium model (Opus 4.6 at 1x) — get deep understanding
 2. **Implement** with a standard model (GPT-5.4 at 1x) — apply the fixes
 3. **Review** the implementation with the premium model again — verify quality
 
@@ -448,16 +453,16 @@ In VS Code, enabling auto model selection lets Copilot choose the best model for
 2. Compare: ask *"Review backend/index.js for security issues"* with GPT-5 mini vs Claude Opus 4.6
 3. In CLI:
    ```bash
-   copilot --model claude-opus-4.6 "Review backend/index.js for security vulnerabilities"
-   copilot --model gpt-5-mini "Add a comment to the GET /todos endpoint"
+   copilot --model claude-opus-4.6 -p "Review backend/index.js for security vulnerabilities"
+   copilot --model gpt-5-mini -p "Add a comment to the GET /todos endpoint"
    ```
 
 #### Common Mistakes to Avoid
 
 - ❌ Using a premium request to ask *"Did I commit my changes?"* — check manually or use a free model
-- ❌ Using Opus (3x) for tasks that GPT-5.4 (1x) handles equally well — 3x cost for ~10-15% more quality rarely pays off
+- ❌ Using Opus for tasks that GPT-5.4 handles equally well — choose the right model for the task complexity
 - ❌ Not selecting the appropriate model — makes Copilot feel frustrating when it's just a model mismatch
-- ❌ Writing vague prompts — even with 3x the budget, bad prompts waste the entire allowance
+- ❌ Writing vague prompts — even with premium models, bad prompts waste the entire allowance
 
 ---
 
@@ -510,7 +515,7 @@ This is the single most important thing to understand about premium request bill
 ##### 4. Code Review on PR
 
 - Every review = **1 × model multiplier** (model auto-selected by GitHub)
-- **Charged to the PR author's seat** — not the reviewer!
+- **For automatic reviews:** charged to the PR author's quota. **For manual reviews:** charged to the requesting user's quota.
 - ⚠️ If you enable automatic review on every PR, consumption multiplies rapidly
 - Configure strictness: `.github/copilot-code-review-instructions.md`
 - 📎 [About code review](https://docs.github.com/en/copilot/concepts/agents/code-review)
@@ -537,7 +542,7 @@ This is the single most important thing to understand about premium request bill
 | Question | Answer |
 |---|---|
 | Who is billed? | The **organization or enterprise** that owns the Copilot seat — NOT the individual user |
-| Multiple orgs? | If a user has seats from multiple orgs in the same enterprise → **billed once** |
+| Multiple orgs? | If a user has licenses from multiple organizations, they must select which entity is billed via the "Usage billed to" dropdown |
 | Multiple licenses? | User must select "Usage billed to" dropdown to choose which entity pays |
 | Budget controls? | Admins can set limits **per org**, **per SKU** (coding agent vs chat vs review) |
 | What happens on overage? | $0.04/request beyond allowance (if enabled by admin policy) |
@@ -593,7 +598,7 @@ Copilot can generate presentations from structured data using agent mode + pytho
 |---|---|
 | **How to activate** | From PR → click "Copilot" → "Review", or configure auto-review at org/repo level |
 | **Model used** | Auto-selected by GitHub (not configurable by user) |
-| **Premium cost** | 1 × model multiplier, charged to the **PR author's seat** |
+| **Premium cost** | 1 × model multiplier. **Automatic reviews:** charged to the PR author's quota. **Manual reviews:** charged to the requesting user's quota |
 | **Configure strictness** | Create `.github/copilot-code-review-instructions.md` in your repo |
 
 **🔧 Hands-on Demo:**
@@ -669,14 +674,14 @@ Submit questions during the session — they'll be addressed throughout and in t
 
 | Action | Command |
 |---|---|
-| Start chat | `copilot "your prompt"` |
+| Start chat | `copilot -p "your prompt"` |
 | Plan mode | `/plan "task description"` |
 | Fleet mode | `/fleet "complex task"` |
 | List skills | `/skills list` |
-| Invoke skill | `/skill-name "prompt"` |
+| Invoke skill | Skills auto-load; use `/skills list` to see available |
 | Install plugin | `/plugin install PLUGIN-NAME` |
 | Allow specific tool | `--allow-tool TOOL` |
-| Skip all permissions | `--dangerously-skip-permissions` |
+| Skip all permissions | `--allow-all` (or `--yolo`) |
 | Disable instructions | `--no-custom-instructions` |
 | Select model | `--model MODEL-NAME` |
 
