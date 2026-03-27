@@ -111,132 +111,45 @@ This starts:
 
 ## 🤖 GitHub Copilot Customization
 
-This repository is a showcase for all the ways you can customize GitHub Copilot's behavior. See the **[Hands-on Workshop Guide](DEMO-GUIDE.md)** for a comprehensive explanation of each feature with demos and commands.
+This repository is a showcase for all the ways you can customize GitHub Copilot's behavior — custom instructions, prompt files, agents, skills, and more.
 
-### Custom Instructions
-
-Always-on context applied to every Copilot interaction.
-
-| File | Scope | Purpose |
-|---|---|---|
-| `copilot-instructions.md` | Repository-wide | General coding conventions and project context |
-| `astro-frontend.instructions.md` | `frontend/**/*.astro,*.ts,*.js` | Astro + Bootstrap patterns, TypeScript conventions |
-| `express-backend.instructions.md` | `backend/**/*.js` | RESTful routes, SQLite queries, error handling |
-| `accessibility.instructions.md` | `frontend/**/*.astro,*.html` | WCAG 2.2 AA, keyboard navigation, ARIA |
-| `code-review.instructions.md` | `**` | Review priorities and checklists |
-| `security.instructions.md` | `**` | OWASP Top 10 for Express + SQLite |
-| `code-comments.instructions.md` | `**/*.js,*.ts,*.astro` | Self-documenting code principles |
-| `github-actions.instructions.md` | `.github/workflows/*.yml` | CI/CD workflow best practices |
-
-### Custom Agents
-
-Specialist personas you select from the agent dropdown in Copilot Chat.
-
-| Agent | Specialization |
-|---|---|
-| `todo-backend` | Express.js backend development |
-| `todo-frontend` | Astro frontend development |
-| `todo-testing` | Jest testing |
-| `todo-database` | SQLite database operations |
-
-### Skills
-
-Procedures Copilot loads automatically when it detects a relevant task.
-
-| Skill | Description |
-|---|---|
-| `create-rest-endpoint` | Step-by-step guide for adding a new Express.js route |
-| `create-astro-component` | Guide for building typed Astro components with Bootstrap |
-| `add-database-migration` | Guide for writing SQLite migration scripts |
-| `generate-jest-tests` | Guide for generating Jest + supertest test suites |
-| `frontend-error-handling` | Guide for adding Bootstrap error feedback to fetch calls |
-
-### Prompt Files
-
-Reusable prompt templates you attach in Copilot Chat.
-
-| Prompt | Purpose |
-|---|---|
-| `add-rest-endpoint.prompt.md` | Add a new API endpoint |
-| `create-astro-component.prompt.md` | Create a new UI component |
-| `generate-backend-tests.prompt.md` | Generate a Jest test suite |
-| `add-todo-filtering.prompt.md` | Add todo filter buttons |
-| `add-dark-mode.prompt.md` | Add dark/light mode toggle |
-| `refactor-routes.prompt.md` | Separate routes into modules |
-
-### 🎯 Hands-on Workshop Guide
-
-For a complete, step-by-step workshop guide with theory, commands, and demos for both VS Code and CLI, see the **[DEMO-GUIDE.md](DEMO-GUIDE.md)**.
-
-The guide covers:
-- All customization features (instructions, prompts, agents, skills, hooks, MCP, plugins)
-- Operating modes comparison (Ask, Plan, Agent, Autopilot, Fleet)
-- Model selection guidance with official recommendations
-- Premium request mechanics for every context (chat, CLI, coding agent, PR review, fleet)
-- Code review configuration on pull requests
-- Non-coding use cases (Excel, PowerPoint)
-
----
-
-## 📖 Workshop Demo Agenda
+👉 **See the [Hands-on Workshop Guide](DEMO-GUIDE.md)** for a comprehensive walkthrough with theory, commands, and demos for both VS Code and CLI. Also available in [Italian](DEMO-GUIDE-IT.md).
 
 <details>
-<summary>1. Introduction to GitHub Copilot</summary>
+<summary>📂 Copilot configuration files in this repo</summary>
 
-- What GitHub Copilot is and how it works
-- Setup and activation in Visual Studio Code
-
-</details>
-
-<details>
-<summary>2. Guidelines and best practices</summary>
-
-- Using Copilot to generate code following best practices
-- Example prompts:
-  - *"Generate a JavaScript function that validates an email address following security best practices."*
-  - *"Write a function that uses the Singleton pattern in TypeScript."*
-
-</details>
-
-<details>
-<summary>3. Task automation</summary>
-
-- **Documentation generation:** *"Generate Markdown documentation for the REST API defined in `backend/index.js`."*
-- **Unit test creation:** *"Generate Jest unit tests for the Express.js `POST /todos` endpoint."*
-
-</details>
-
-<details>
-<summary>4. Database migration</summary>
-
-- *"Generate a Node.js script to migrate data from SQLite to PostgreSQL maintaining the `todos` table structure."*
-- *"Write a SQL query to add a new `priority` column to the `todos` table."*
-
-</details>
-
-<details>
-<summary>5. Debugging and refactoring</summary>
-
-- *"Refactor the code in `TodoItem.astro` to reduce duplication."*
-- *"Find and fix any issues in `TodoItem.astro`."*
-
-</details>
-
-<details>
-<summary>6. Integration with external APIs</summary>
-
-- *"Generate a function that syncs todos with a cloud service like Azure Cosmos DB."*
-
-</details>
-
-<details>
-<summary>7. Copilot Agents, Skills & Prompt Files</summary>
-
-- **Custom Instructions** — Show how Copilot follows project conventions automatically
-- **Path-Specific Instructions** — Edit backend vs. frontend files and observe different guidelines
-- **Skills** — Trigger repeatable procedures like `create-rest-endpoint`
-- **Prompt Files** — Attach reusable prompts like `add-rest-endpoint.prompt.md`
-- **Coding Agent** — Assign a GitHub Issue to Copilot and watch it open a PR
+```
+.github/
+├── copilot-instructions.md              # Repository-wide conventions
+├── instructions/                        # Path-specific instructions
+│   ├── astro-frontend.instructions.md   # Astro + Bootstrap patterns
+│   ├── express-backend.instructions.md  # Express.js + SQLite patterns
+│   ├── accessibility.instructions.md    # WCAG 2.2 AA
+│   ├── code-review.instructions.md      # Review priorities
+│   ├── security.instructions.md         # OWASP Top 10
+│   ├── code-comments.instructions.md    # Commenting rules
+│   └── github-actions.instructions.md   # CI/CD best practices
+├── agents/                              # Custom agents
+│   ├── todo-backend.agent.md            # Express.js specialist
+│   ├── todo-frontend.agent.md           # Astro specialist
+│   ├── todo-testing.agent.md            # Jest + Playwright specialist
+│   └── todo-database.agent.md           # SQLite specialist
+├── prompts/                             # Reusable prompt files
+│   ├── add-rest-endpoint.prompt.md
+│   ├── create-astro-component.prompt.md
+│   ├── generate-backend-tests.prompt.md
+│   ├── generate-frontend-tests.prompt.md
+│   ├── add-todo-filtering.prompt.md
+│   ├── add-dark-mode.prompt.md
+│   └── refactor-routes.prompt.md
+└── skills/                              # Agent skills
+    ├── create-rest-endpoint/
+    ├── create-astro-component/
+    ├── add-database-migration/
+    ├── generate-jest-tests/
+    ├── generate-playwright-tests/
+    └── frontend-error-handling/
+```
 
 </details>
 
