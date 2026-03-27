@@ -497,7 +497,7 @@ This is the single most important thing to understand about premium request bill
 
 - Same logic: every prompt = **1 × model multiplier**
 - No additional interface multiplier
-- Fleet mode: `/fleet` = **1 premium request** (parallel subagents do NOT count)
+- Fleet mode: `/fleet` — ⚠️ each subagent interacts with the LLM independently, so fleet **may consume MORE premium requests** than a single agent session. The trade-off is speed vs. cost.
 
 ##### 3. Coding Agent (remote, on GitHub)
 
@@ -524,9 +524,12 @@ This is the single most important thing to understand about premium request bill
 
 ##### 6. Fleet Mode
 
-- `/fleet` = **1 premium request**
-- Parallel subagents = **❌ Free** (no additional premium requests)
-- This makes fleet the most cost-efficient mode for large, parallelizable tasks
+- ⚠️ **Fleet can consume MORE premium requests**, not fewer
+- Each subagent interacts with the LLM independently → more LLM interactions = more premium requests consumed
+- The benefit is **speed** (parallel execution), not cost savings
+- Subagents use a low-cost model by default, but you can specify premium models per subtask
+- **Trade-off:** faster completion vs. higher premium request consumption
+- Use `/model` to check the current model and its multiplier before running `/fleet`
 - 📎 [Fleet mode](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/fleet)
 
 #### Who Pays? (Enterprise/Organization)
