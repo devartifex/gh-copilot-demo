@@ -378,10 +378,34 @@ Same task across all modes to see the difference:
 | CLI advantage | Description |
 |---|---|
 | **Fleet mode** (`/fleet`) | Parallel subagent execution — not available in VS Code |
+| **Delegate** (`/delegate`) | Hand off tasks to Copilot coding agent in the cloud |
 | **Plugins** (`/plugin install`) | Installable feature bundles |
 | **Hooks** | Programmable guardrails at lifecycle events |
 | **Full autonomy** | `--allow-all` + `--autopilot` for unattended batch work |
 | **Scriptable** | Pipe prompts, chain with CI/CD, automate repetitive tasks |
+
+### Delegate — Hand Off Tasks to the Cloud
+
+📎 [Delegating tasks](https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli-agents/delegate-tasks-to-cca)
+
+The `/delegate` command pushes your current CLI session to **Copilot coding agent on GitHub**. This lets you hand off work while preserving all the context Copilot needs. Copilot commits your unstaged changes to a new branch, opens a **draft pull request**, works in the background, and requests your review when done.
+
+```bash
+# Delegate a task — Copilot creates a branch, opens a draft PR, and works autonomously
+/delegate Add comprehensive unit tests for all API endpoints and fix any failures
+
+# Alternative syntax: prefix with &
+& Refactor the Express routes into separate module files under backend/routes/
+```
+
+**What happens:**
+1. Copilot asks to commit your unstaged changes as a checkpoint
+2. Creates a new branch
+3. Opens a draft PR on GitHub
+4. Works autonomously in the cloud — you get a link to track progress
+5. When done, requests your review
+
+**Best for:** bulk changes, refactoring, test generation, documentation — tasks you'd rather not babysit.
 
 ### Hooks — Lifecycle Events
 
@@ -422,7 +446,9 @@ copilot --no-custom-instructions -p "Add a new endpoint"
 
 📎 [Model comparison](https://docs.github.com/en/copilot/reference/ai-models/model-comparison)
 
-#### Official Recommendations by Task
+#### Official GitHub Recommendations
+
+GitHub provides recommendations organized by task area. These are a useful **starting point**, but not the final word:
 
 | Task Area | Recommended Models | Why |
 |---|---|---|
@@ -431,6 +457,21 @@ copilot --no-custom-instructions -p "Add a new endpoint"
 | **Deep reasoning & debugging** | GPT-5.4, Claude Opus 4.6, Claude Sonnet 4.6, Gemini 3.1 Pro | Complex analysis, multi-file understanding |
 | **Agentic development** | GPT-5.4 mini, GPT-5.2-Codex, GPT-5.3-Codex, GPT-5.1-Codex-Max | Optimized for autonomous agent workflows |
 | **Visuals (screenshots, UI)** | GPT-5 mini, Claude Sonnet 4.6, Gemini 3.1 Pro | Multimodal input support |
+
+#### Public Benchmarks — Do Your Own Research
+
+Beyond GitHub's recommendations, several **independent, public benchmarks** track how models perform on real coding tasks. These are useful for forming your own opinion:
+
+| Benchmark | What it measures | Link |
+|---|---|---|
+| **SWE-bench** | Real-world GitHub issues — can the model generate patches that pass tests? | [swebench.com](http://www.swebench.com/) |
+| **Aider Polyglot** | Multi-language code editing (C++, Go, Java, JS, Python, Rust) — 225 practical cases | [aider.chat/docs/leaderboards](https://aider.chat/docs/leaderboards/) |
+| **LiveCodeBench** | Fresh competitive programming problems — prevents memorization | [livecodebench.github.io](https://livecodebench.github.io/) |
+| **LiveBench** | Diverse, regularly updated tasks with coding, reasoning, and agentic categories | [livebench.ai](https://livebench.ai/) |
+
+> **An honest take:** Benchmarks and official recommendations are starting points, not gospel. Models evolve rapidly — what was best last month may not be best today. The differences between top models are often **marginal** (a few percentage points on benchmarks), and **your specific codebase, language, and workflow** matter more than any leaderboard.
+>
+> The best approach: **try different models on your actual tasks**, compare the results, and develop your own intuition. What works for a Python data pipeline may not be the best choice for a React frontend. Use `/model` in the CLI or the model selector in VS Code to experiment.
 
 #### Practical Use Cases
 
