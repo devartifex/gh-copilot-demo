@@ -13,7 +13,7 @@
   - [2.5 Additional Customization Features (CLI)](#25-additional-customization-features-cli)
   - [2.6 Where Each Customization Can Live: Repo vs User vs Org](#26-where-each-customization-can-live-repo-vs-user-vs-org)
   - [2.7 The Operating Modes: Ask, Plan, Agent, Autopilot, Fleet](#27-the-operating-modes-ask-plan-agent-autopilot-fleet)
-- [Part 3 — Focus: Copilot CLI](#part-3--focus-copilot-cli-%EF%B8%8F-10-min)
+- [Part 3 — CLI Deep Dive: Unique Features](#part-3--cli-deep-dive-unique-features-%EF%B8%8F-10-min)
 - [Part 4 — Best Practices: Models, Premium Requests & Real Use Cases](#part-4--best-practices-models-premium-requests--real-use-cases--30-min)
   - [4.1 Choosing the Right Model](#41-choosing-the-right-model)
   - [4.2 Premium Requests: How They REALLY Work](#42-premium-requests-how-they-really-work-)
@@ -41,7 +41,7 @@ Session objectives:
 - GitHub Copilot CLI installed
 - A GitHub account with Copilot access
 
-### Setup
+### Setup — The Demo App
 
 ```bash
 git clone https://github.com/devartifex/gh-copilot-demo.git
@@ -51,6 +51,39 @@ npm run dev
 ```
 
 Verify: Frontend at http://localhost:4321, Backend at http://localhost:3000
+
+### Setup — Copilot CLI
+
+Throughout this workshop we'll use both VS Code and the Copilot CLI. The CLI is the same Copilot — same customizations, same models — but in the terminal. It also has unique features like fleet mode, plugins, and hooks.
+
+**Install:**
+
+```bash
+# macOS
+brew install copilot-cli
+
+# Windows
+winget install GitHub.Copilot
+
+# Verify
+copilot --version
+```
+
+**VS Code integration:** CLI sessions appear in VS Code's Copilot Chat "Sessions" view, and vice versa. They share the same customization files (instructions, agents, skills, prompts).
+
+**Quick reference for the CLI commands used in this guide:**
+
+| What | Command |
+|---|---|
+| Send a prompt | `copilot -p "your prompt"` |
+| Plan before acting | `/plan "task"` |
+| Parallel execution | `/fleet "task"` |
+| List skills | `/skills list` |
+| Skip all permissions | `--allow-all` (or `--yolo`) |
+| Select a model | `--model MODEL-NAME` |
+| Disable custom instructions | `--no-custom-instructions` |
+
+📎 [CLI documentation](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/comparing-cli-features)
 
 ---
 
@@ -334,58 +367,50 @@ Same task across all modes to see the difference:
 
 ---
 
-## Part 3 — Focus: Copilot CLI 🖥️ (~10 min)
+## Part 3 — CLI Deep Dive: Unique Features 🖥️ (~10 min)
 
-📎 [Comparing CLI features](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/comparing-cli-features)
+> CLI basics and installation were covered in [Part 1](#setup--copilot-cli). This section focuses on CLI-exclusive features.
+
 📎 [Autopilot mode](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/autopilot)
 
-### Installation
+### Why use the CLI over VS Code?
 
-```bash
-# macOS
-brew install copilot-cli
+| CLI advantage | Description |
+|---|---|
+| **Fleet mode** (`/fleet`) | Parallel subagent execution — not available in VS Code |
+| **Plugins** (`/plugin install`) | Installable feature bundles |
+| **Hooks** | Programmable guardrails at lifecycle events |
+| **Full autonomy** | `--allow-all` + `--autopilot` for unattended batch work |
+| **Scriptable** | Pipe prompts, chain with CI/CD, automate repetitive tasks |
 
-# Windows
-winget install GitHub.Copilot
+### Hooks — Lifecycle Events
 
-# Verify
-copilot --version
-```
+Hooks let you run custom shell commands at specific moments. Configured in `.github/hooks/*.json`.
 
-### VS Code Integration
+| Hook | When it runs |
+|---|---|
+| `preToolUse` / `postToolUse` | Before/after a tool runs |
+| `userPromptSubmitted` | When user submits a prompt |
+| `sessionStart` / `sessionEnd` | At session start/end |
+| `errorOccurred` | When an error occurs |
+| `agentStop` / `subagentStop` | When main agent or subagent completes |
 
-CLI sessions appear in VS Code's Copilot Chat "Sessions" view, and vice versa. They share the same customization files (instructions, agents, skills, prompts).
-
-### Why use the CLI?
-
-The CLI provides features not available in VS Code:
-
-- **Fleet mode** (`/fleet`) — parallel subagent execution
-- **Plugins** (`/plugin install`) — installable feature bundles
-- **Hooks** — programmable guardrails at lifecycle events (see [section 2.5](#25-additional-customization-features-cli))
-- **Full autonomy flags** — `--allow-all` / `--yolo` for unattended batch work
-- **Scriptable** — pipe prompts, chain with CI/CD, automate repetitive tasks
+Use cases: block edits to protected paths, log activity, enforce policy, custom retry logic.
 
 ### 🔧 Hands-on Demo
 
 ```bash
-# Direct prompt
-copilot -p "Explain the structure of the backend API"
-
-# Plan mode — analyze before acting
-/plan "Add a search endpoint to filter todos by text"
+# Full autonomy for batch work
+copilot --autopilot --allow-all -p "Run all tests and fix any failures"
 
 # Fleet mode — parallel execution
 /fleet "Add todo categories: create the database table, API endpoints, and frontend selector"
 
-# List skills
-/skills list
-
-# Full autonomy for batch work
-copilot --autopilot --allow-all -p "Run all tests and fix any failures"
+# Disable instructions to see the difference
+copilot --no-custom-instructions -p "Add a new endpoint"
 ```
 
-> **Key insight:** The CLI is not a separate tool — it's the same Copilot with the same customizations, just in the terminal. Use it when you want scriptability, fleet mode, or unattended automation.
+> **Key insight:** The CLI is the same Copilot with the same customizations, just in the terminal. Use it when you need fleet mode, hooks, plugins, or unattended automation.
 
 ---
 
