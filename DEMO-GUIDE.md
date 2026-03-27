@@ -158,7 +158,7 @@ Copilot isn't just autocomplete — it's a deeply customizable assistant. This s
 
 **🔧 Hands-on Demo:**
 
-1. In VS Code Copilot Chat, click the attachment icon (📎) → select `add-dark-mode.prompt.md`
+1. In VS Code Copilot Chat, type `/add-dark-mode` to invoke the prompt file
 2. Observe: Copilot follows the prompt template to implement dark/light mode toggle
 3. Try `generate-backend-tests.prompt.md` — generates a complete Jest test suite
 4. CLI: prompt files are available as context in the CLI too
@@ -301,12 +301,12 @@ Beyond the four main levers, Copilot CLI supports additional customization primi
 
 | Feature | Repo (`.github/`) | User level | Org/Enterprise | Key differences |
 |---|---|---|---|---|
-| **Custom Instructions** | ✅ `copilot-instructions.md`, `instructions/*.instructions.md`, `AGENTS.md` | ✅ **CLI**: `$HOME/.copilot/copilot-instructions.md` + `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` env. **VS Code**: via settings UI. **GitHub.com**: personal instructions in settings | ✅ Organization instructions via GitHub UI | CLI user-level is file-based; VS Code/GitHub.com is settings-based |
+| **Custom Instructions** | ✅ `copilot-instructions.md`, `instructions/*.instructions.md`, `AGENTS.md` | ✅ **CLI**: `$HOME/.copilot/copilot-instructions.md` + `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` env. **VS Code**: file-based in `~/.copilot/instructions/` or VS Code profile instructions folder (settings UI deprecated since 1.102). **GitHub.com**: personal instructions in settings | ✅ Organization instructions via GitHub UI | CLI user-level is file-based; VS Code/GitHub.com is settings-based |
 | **Prompt Files** | ✅ `prompts/*.prompt.md` | ✅ **VS Code only**: `prompts/` folder in user profile. **CLI**: ❌ no user-level | ❌ | User-level prompt files are a VS Code feature only |
 | **Custom Agents** | ✅ `agents/*.agent.md` | ✅ User profile (VS Code + CLI) | ✅ `.github-private` repo | Lowest level wins on name conflicts |
 | **Skills** | ✅ `skills/<name>/SKILL.md` | ✅ **CLI + coding agent**: `~/.copilot/skills/`. **VS Code**: ✅ (since 1.108) | 🔜 Coming soon | Personal skills shared across projects |
 | **Hooks** | ✅ `hooks/*.json` | ❌ | ❌ | Repo-level only |
-| **MCP Servers** | ✅ `mcp.json` + repo settings | ✅ User IDE config (VS Code `settings.json`, CLI config) | ✅ via `mcp-servers` property in agent configs | Config format varies by environment |
+| **MCP Servers** | ✅ `mcp.json` + repo settings | ✅ User IDE config (VS Code `.vscode/mcp.json`, CLI config) | ✅ via `mcp-servers` property in agent configs | Config format varies by environment |
 | **Subagents** | N/A (runtime) | N/A | N/A | Not user-configured |
 | **Plugins** | N/A | ✅ CLI plugin system (user-installed globally) | N/A | CLI-only |
 
@@ -436,8 +436,8 @@ copilot --no-custom-instructions -p "Add a new endpoint"
 
 | Use Case | Recommended Model | Multiplier | Key Takeaway |
 |---|---|---|---|
-| In-depth PR review | Claude Opus 4.6 (premium) | 1x | Complex analysis deserves a premium model |
-| Planning/architecture + review | Opus for analysis → GPT-5.4 for fix | 1x + 1x | Multi-model pattern: review premium, fix standard |
+| In-depth PR review | Claude Opus 4.6 (premium) | 3x | Complex analysis deserves a premium model |
+| Planning/architecture + review | Opus for analysis → GPT-5.4 for fix | 3x + 1x | Multi-model pattern: review premium, fix standard |
 | Refactoring / implementation | GPT-5.4 | 1x | Unified GPT + Codex, native agent support |
 | Quick lightweight tasks | GPT-5.4 mini | 1x | Near-premium benchmarks at standard cost |
 | Documentation / comments | Free tier model | 0x | Keep repetitive writing lightweight |
@@ -448,11 +448,13 @@ copilot --no-custom-instructions -p "Add a new endpoint"
 | Basic checks (git status) | Free or manual | 0x | Don't waste premium on trivial tasks |
 | **Code Review on PR** 🔍 | Auto-selected by GitHub | varies | AI review directly on the pull request |
 
+> **Note:** Model multipliers change over time. Use `/model` in the CLI or check the model selector in VS Code to see current multipliers. See [supported models](https://docs.github.com/en/copilot/reference/ai-models/supported-models) for the latest.
+
 #### Multi-Model Pattern
 
 Combine models based on their strengths, not just cost:
 
-1. **Analyze** with a deep reasoning model (Opus 4.6 or GPT-5.4) — get thorough understanding
+1. **Analyze** with a deep reasoning model (Opus 4.6 at 3x, or GPT-5.4 at 1x) — get thorough understanding
 2. **Implement** with a fast, general-purpose model (GPT-5 mini at 0x on paid plans) — apply changes quickly at zero premium cost
 3. **Review** the result with the deep reasoning model again — catch edge cases
 
@@ -478,7 +480,7 @@ In VS Code, enabling auto model selection lets Copilot choose the best model for
 #### Common Mistakes to Avoid
 
 - ❌ Using a premium request to ask *"Did I commit my changes?"* — check manually or use a free model
-- ❌ Using Opus for tasks that GPT-5.4 handles equally well — choose the right model for the task complexity
+- ❌ Using Opus (3x) for tasks that GPT-5.4 (1x) handles equally well — 3x the cost for marginal improvement
 - ❌ Not selecting the appropriate model — makes Copilot feel frustrating when it's just a model mismatch
 - ❌ Writing vague prompts — even with premium models, bad prompts waste the entire allowance
 
@@ -524,7 +526,7 @@ This is the single most important thing to understand about premium request bill
 
 ##### 3. Coding Agent (remote, on GitHub)
 
-- **1 premium request per session** — regardless of complexity
+- **1 premium request per session × model multiplier** — a session with a 3x model costs 3 premium requests
 - A session starts when you assign a task → ends when it completes
 - New steering comment on existing session = **new premium request**
 - Dedicated billing SKU since November 2025 for separate tracking
@@ -636,7 +638,7 @@ Copilot auto-loads the skill and runs the full pipeline: fetch → summarize →
 |---|---|
 | **How to activate** | From PR → click "Copilot" → "Review", or configure auto-review at org/repo level |
 | **Model used** | Auto-selected by GitHub (not configurable by user) |
-| **Premium cost** | 1 × model multiplier. **Automatic reviews:** charged to the PR author's quota. **Manual reviews:** charged to the requesting user's quota |
+| **Premium cost** | 1 premium request (flat). **Automatic reviews:** charged to the PR author's quota. **Manual reviews:** charged to the requesting user's quota |
 | **Configure strictness** | Use `.github/copilot-instructions.md` (repo-wide) or `.github/instructions/code-review.instructions.md` (path-specific) |
 
 **🔧 Hands-on Demo:**
@@ -690,10 +692,10 @@ Submit questions during the session — they'll be addressed throughout and in t
 
 | Action | How |
 |---|---|
-| Open Copilot Chat | `Ctrl+Shift+I` (Windows) / `Cmd+Shift+I` (Mac) |
+| Open Copilot Chat | `Ctrl+Alt+I` (Windows) / `Cmd+Alt+I` (Mac) |
 | Switch mode (Ask/Plan/Agent) | Dropdown at top of chat panel |
 | Select agent | Agent dropdown in chat |
-| Attach prompt file | 📎 icon → select `.prompt.md` file |
+| Attach prompt file | Type `/` and select the prompt file |
 | Change model | Model selector dropdown |
 | Enable Autopilot | Settings → "Chat: Agent Approval Mode" → Autopilot |
 
