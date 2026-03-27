@@ -10,7 +10,7 @@
     "test": "playwright test"
   },
   "dependencies": {
-    "astro": "^5.7.10"
+    "astro": "^5.18.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1"
