@@ -13,7 +13,6 @@
   - [2.5 Additional Customization Features (CLI)](#25-additional-customization-features-cli)
   - [2.6 Where Each Customization Can Live: Repo vs User vs Org](#26-where-each-customization-can-live-repo-vs-user-vs-org)
   - [2.7 The Operating Modes: Ask, Plan, Agent, Autopilot, Fleet](#27-the-operating-modes-ask-plan-agent-autopilot-fleet)
-  - [2.8 Configuration Levels](#28-configuration-levels)
 - [Part 3 — Focus: Copilot CLI](#part-3--focus-copilot-cli-%EF%B8%8F-10-min)
 - [Part 4 — Best Practices: Models, Premium Requests & Real Use Cases](#part-4--best-practices-models-premium-requests--real-use-cases--30-min)
   - [4.1 Choosing the Right Model](#41-choosing-the-right-model)
@@ -96,7 +95,7 @@ Copilot isn't just autocomplete — it's a deeply customizable assistant. This s
    - Same instructions are loaded automatically
 4. Disable instructions to see the difference:
    ```bash
-   copilot --no-custom-instructions "Add a new PATCH /todos/:id endpoint"
+   copilot --no-custom-instructions -p "Add a new PATCH /todos/:id endpoint"
    ```
 
 **📁 Files in this repo:**
@@ -335,21 +334,6 @@ Same task across all modes to see the difference:
 
 ---
 
-### 2.8 Configuration Levels
-
-Copilot customizations can be configured at multiple levels:
-
-| Level | Where | Shared with | Best for |
-|---|---|---|---|
-| **Repository** | `.github/` folder | Team (via git) | Project-specific standards |
-| **User** | `$HOME/.copilot/` folder | Nobody (personal) | Personal preferences, cross-project reuse |
-| **Organization** | `.github-private` repo or GitHub UI | Entire org | Company-wide standards |
-| **Enterprise** | GitHub UI settings | All orgs in enterprise | Compliance and governance |
-
-> **Tip:** If you can't commit `.github/` AI files to your repo, configure everything at user level. You lose team sharing but keep all the customization benefits.
-
----
-
 ## Part 3 — Focus: Copilot CLI 🖥️ (~10 min)
 
 📎 [Comparing CLI features](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/comparing-cli-features)
@@ -372,49 +356,36 @@ copilot --version
 
 CLI sessions appear in VS Code's Copilot Chat "Sessions" view, and vice versa. They share the same customization files (instructions, agents, skills, prompts).
 
-### Key CLI Features
+### Why use the CLI?
 
-| Feature | Command | Description |
-|---|---|---|
-| Ask | `copilot -p "question"` | Direct question |
-| Plan | `/plan "task"` | Plan before acting |
-| Fleet | `/fleet "task"` | Parallel execution |
-| Skills | `/skills list` | List available skills |
-| Plugins | `/plugin install NAME` | Install plugin bundle |
-| Allow tools | `--allow-tool TOOL` | Pre-approve specific tools |
-| Full autonomy | `--allow-all` (or `--yolo`) | Skip all permission prompts |
-| No instructions | `--no-custom-instructions` | Disable custom instructions |
+The CLI provides features not available in VS Code:
 
-### Hooks (CLI lifecycle events)
-
-| Hook | When it runs |
-|---|---|
-| `preToolUse` / `postToolUse` | Before/after a tool runs |
-| `userPromptSubmitted` | When user submits a prompt |
-| `sessionStart` / `sessionEnd` | At session start/end |
-| `errorOccurred` | When an error occurs |
-| `agentStop` | When the main agent stops |
-| `subagentStop` | When a subagent completes |
-
-Use hooks for guardrails (block edits to protected paths), logging, or custom retry logic.
+- **Fleet mode** (`/fleet`) — parallel subagent execution
+- **Plugins** (`/plugin install`) — installable feature bundles
+- **Hooks** — programmable guardrails at lifecycle events (see [section 2.5](#25-additional-customization-features-cli))
+- **Full autonomy flags** — `--allow-all` / `--yolo` for unattended batch work
+- **Scriptable** — pipe prompts, chain with CI/CD, automate repetitive tasks
 
 ### 🔧 Hands-on Demo
 
 ```bash
-# Same task in CLI vs VS Code — compare the experience
+# Direct prompt
 copilot -p "Explain the structure of the backend API"
 
-# Use plan mode
+# Plan mode — analyze before acting
 /plan "Add a search endpoint to filter todos by text"
 
-# Use fleet mode for a complex task
+# Fleet mode — parallel execution
 /fleet "Add todo categories: create the database table, API endpoints, and frontend selector"
 
-# List and invoke skills
+# List skills
 /skills list
-# Skills auto-load based on context; just describe the task:
-copilot -p "Add GET /todos/search?q=query endpoint"
+
+# Full autonomy for batch work
+copilot --autopilot --allow-all -p "Run all tests and fix any failures"
 ```
+
+> **Key insight:** The CLI is not a separate tool — it's the same Copilot with the same customizations, just in the terminal. Use it when you want scriptability, fleet mode, or unattended automation.
 
 ---
 
@@ -454,11 +425,13 @@ copilot -p "Add GET /todos/search?q=query endpoint"
 
 #### Multi-Model Pattern
 
-The most cost-effective workflow for complex tasks:
+Combine models based on their strengths, not just cost:
 
-1. **Analyze** with a premium model (Opus 4.6 at 1x) — get deep understanding
-2. **Implement** with a standard model (GPT-5.4 at 1x) — apply the fixes
-3. **Review** the implementation with the premium model again — verify quality
+1. **Analyze** with a deep reasoning model (Opus 4.6 or GPT-5.4) — get thorough understanding
+2. **Implement** with a fast, general-purpose model (GPT-5 mini at 0x on paid plans) — apply changes quickly at zero premium cost
+3. **Review** the result with the deep reasoning model again — catch edge cases
+
+> The real savings come from using **included models (0x cost)** for straightforward work, and reserving premium models for tasks that genuinely need deeper reasoning.
 
 #### Auto Model Selection
 
@@ -534,11 +507,7 @@ This is the single most important thing to understand about premium request bill
 
 ##### 4. Code Review on PR
 
-- Every review = **1 × model multiplier** (model auto-selected by GitHub)
-- **For automatic reviews:** charged to the PR author's quota. **For manual reviews:** charged to the requesting user's quota.
-- ⚠️ If you enable automatic review on every PR, consumption multiplies rapidly
-- Configure strictness: `.github/copilot-code-review-instructions.md`
-- 📎 [About code review](https://docs.github.com/en/copilot/concepts/agents/code-review)
+- Premium request billing for code review is covered in [Part 5](#code-review-on-pull-requests-).
 
 ##### 5. Planning + Execution (Agentic Pattern)
 
@@ -562,8 +531,7 @@ This is the single most important thing to understand about premium request bill
 | Question | Answer |
 |---|---|
 | Who is billed? | The **organization or enterprise** that owns the Copilot seat — NOT the individual user |
-| Multiple orgs? | If a user has licenses from multiple organizations, they must select which entity is billed via the "Usage billed to" dropdown |
-| Multiple licenses? | User must select "Usage billed to" dropdown to choose which entity pays |
+| Multiple licenses? | User must select which entity is billed via the "Usage billed to" dropdown |
 | Budget controls? | Admins can set limits **per org**, **per SKU** (coding agent vs chat vs review) |
 | What happens on overage? | $0.04/request beyond allowance (if enabled by admin policy) |
 
@@ -663,17 +631,6 @@ Submit questions during the session — they'll be addressed throughout and in t
 | External service integration | **MCP Servers** |
 | Complex tasks delegated automatically | **Subagents** (automatic) |
 | Distributable bundle of functionality | **Plugins** |
-
-### IDE and Surface Support
-
-| Feature | VS Code | Visual Studio | JetBrains | GitHub.com | CLI |
-|---|---|---|---|---|---|
-| Custom Instructions | ✅ | ✅ | Preview | ✅ | ✅ |
-| Prompt Files | ✅ | ✅ | Preview | ❌ | ✅ |
-| Custom Agents | ✅ | ❌ | Preview | ✅ | ✅ |
-| Skills | ✅ | ❌ | Preview | ✅ | ✅ |
-| Hooks | Preview | ❌ | ❌ | ✅ | ✅ |
-| MCP Servers | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ---
 
